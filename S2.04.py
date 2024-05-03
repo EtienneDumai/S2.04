@@ -40,18 +40,48 @@ def requete2():
 
 requete2()
 def requete3():
-    SQLCommand = ("""SELECT COUNT(*) AS nombre_total_logements, (SELECT COUNT(*) 
+    reponse = int(input("Voulez-vous un diagramme ou le nombre de logement qui sont détenus par des hotes ou des superhotes ?\n1-Diagramme \n2-Valeur en particulier\n"))
+    if reponse == 1 : 
+        SQLCommand = ("""SELECT COUNT(*) AS nombre_total_logements, (SELECT COUNT(*) 
 FROM logements AS l
 JOIN hosts AS h ON l.host_id = h.host_id
 WHERE h.host_is_superhost = 1) AS nombre_logements_superhosts
 FROM logements l;
 """)
-    cursor.execute(SQLCommand)
-    for row in cursor.fetchall():
-        print(row)
+        cursor.execute(SQLCommand)
+        result = cursor.fetchone()
+        labels = ['Hotes', 'SuperHotes']
+        sizes = [result[0], result[1]]      
+        plt.pie(sizes, labels=labels, autopct=lambda p: f"{int(p/100.*sum(sizes))}", startangle=90)
+        plt.axis('equal')
+        plt.title('Nombre de logement répartit entre les hotes et les super hotes')
+        plt.show()
+    elif reponse == 2:
+        valeur = int(input("Voulez-vous le nombre de logements détenus par : \n1- Les hotes\n2- Les SuperHotes\n"))
+        if valeur == 1 : 
+            SQLCommand = ("""SELECT COUNT(*) AS nombre_total_logements, (SELECT COUNT(*) 
+    FROM logements AS l
+    JOIN hosts AS h ON l.host_id = h.host_id
+    WHERE h.host_is_superhost = 1) AS nombre_logements_superhosts
+    FROM logements l;
+    """)
+            cursor.execute(SQLCommand)
+            for row in cursor.fetchall():
+                print(f"Nombre de logements détenus par des hotes : {row[0]} logements")
+        elif valeur == 2 : 
+            SQLCommand = ("""SELECT COUNT(*) AS nombre_total_logements, (SELECT COUNT(*) 
+    FROM logements AS l
+    JOIN hosts AS h ON l.host_id = h.host_id
+    WHERE h.host_is_superhost = 1) AS nombre_logements_superhosts
+    FROM logements l;
+    """)
+            cursor.execute(SQLCommand)
+            for row in cursor.fetchall():
+                print(f"Nombre de logements détenus par des super-hotes : {row[1]} logements")
+            
 requete3()
 def requete4():
-    reponse=int(input("Voulez - vous un diagramme ou une valeur en particulier ?\n1-Diagramme \n2-Valeur en particulier \n"))
+    reponse=int(input("Voulez-vous un diagramme ou une valeur en particulier ?\n1-Diagramme \n2-Valeur en particulier \n"))
     if reponse == 1:
         SQLCommand = ("""SELECT
       ROUND(SUM(CASE WHEN host_is_superhost THEN 1 ELSE 0 END) / COUNT(*),2) * 100 AS pourcentage_superhotes,
@@ -60,7 +90,6 @@ def requete4():
     """)
         cursor.execute(SQLCommand)
         results = cursor.fetchone()
-        print("TTTTTTTTTTTTTTTT")
         labels = ['Superhôtes', 'Hôtes']
         sizes = [results[0], results[1]] 
         plt.figure(figsize=(8, 6))
@@ -127,7 +156,7 @@ ORDER BY Pourcentage DESC;""")
     plt.title("Graphique des stocks des articles de plus de 5 euros à l'unité")
     plt.show()
     
-    
+
     
     
     
