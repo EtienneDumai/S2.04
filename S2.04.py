@@ -11,8 +11,22 @@ cursor = conn.cursor()
 cursor = conn.cursor()
 RefArticles = []
 qteStockArticles = []
-
-
+def appli():
+    while True:
+        reponse=int(input("""\n\nQuelle requete voulez vous choisir ?\n1-Pourcentage de logement par type de logements\n2-Moyenne de prix par type de logement\n3-Nombre de logements détenus par les hotes et les superhotes\n4-Pourcentage d'hotes et de super hotes\n999-Sortir\n"""))
+        if reponse == 1 :
+            requete1()
+        elif reponse == 2 :
+            requete2()
+        elif reponse == 3 :
+            requete3()
+        elif reponse == 4 :
+            requete4()
+        elif reponse == 999 :
+            break
+        else:
+            print("Veuillez entrer un numéro valide")
+appli()
 def requete1():
     reponse = int(input("Voulez-vous un diagramme ou le pourcentage du nombre de logement par type ?\n1-Diagramme \n2-Valeur en particulier\n"))
     if reponse == 1:
