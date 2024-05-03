@@ -14,7 +14,55 @@ qteStockArticles = []
 
 
 def requete1():
-    SQLCommand = ("""SELECT TP.logt_room_type As TypeDeLogement, 
+    reponse = int(input("Voulez-vous un diagramme ou le pourcentage du nombre de logement par type ?\n1-Diagramme \n2-Valeur en particulier\n"))
+    if reponse == 1:
+        SQLCommand = ("""SELECT TP.logt_room_type As TypeDeLogement, 
+           ROUND((count(TP.log_room_idtype)*100)/ (SELECT COUNT(*) FROM logements), 2) AS Pourcentage
+    FROM logements L
+    INNER JOIN types_logements TP ON L.log_room_idtype = TP.log_room_idtype 
+    INNER JOIN nodenot_bd.agglo_paysbasque AP ON L.logt_codeINSEE = nodenot_bd.AP.code_insee
+    GROUP BY TP.logt_room_type
+    ORDER BY Pourcentage DESC;""")
+        cursor.execute(SQLCommand)
+        result = cursor.fetchall()
+        labels = ['Entire home/apt','Private room', 'Shared room','Hotel room']
+        print(result)
+        sizes = [result[0][1], result[1][1],result[2][1],result[3][1]] 
+        plt.figure(figsize=(10, 6))
+        plt.bar(labels, sizes, color='purple')
+        plt.xlabel('Type de Logement')
+        plt.ylabel('Pourcentage de logement')
+        plt.title('pourcentage de chaque type de logements')
+        plt.xticks(labels, [f'{l}\n({s}%)' for l, s in zip(labels, sizes)],rotation=45)
+        plt.show()
+    if reponse == 2:
+        valeur = int(input("Quel type de logement en particulier voulez-vous connaitre pourcentage ?\n1-Entire home/apt \n2-Hotel room\n3-Private room\n4-Shared room\n"))
+        if valeur == 1 :
+            filtre = "Entire home/apt"
+        elif valeur == 2:
+            filtre = "Hotel room"
+        elif valeur == 3:
+            filtre = "Private room"
+        elif valeur == 4:
+            filtre = "Shared room"
+        else:
+            print("Veuillez entrer un réponse valide")
+        SQLCommand = ("""SELECT TP.logt_room_type As TypeDeLogement, 
+           ROUND((count(TP.log_room_idtype)*100)/ (SELECT COUNT(*) FROM logements), 2) AS Pourcentage
+    FROM logements L
+    INNER JOIN types_logements TP ON L.log_room_idtype = TP.log_room_idtype 
+    INNER JOIN nodenot_bd.agglo_paysbasque AP ON L.logt_codeINSEE = nodenot_bd.AP.code_insee
+    WHERE TP.logt_room_type = ?
+    GROUP BY TP.logt_room_type
+    ORDER BY Pourcentage DESC;""")
+        param = (f'{filtre}')
+        cursor.execute(SQLCommand,param)
+        for row in cursor.fetchall():
+            print(f"Type de logement : {row[0]} | Pourcentage du nombre de logement : {round(row[1], 2)} %")
+        
+requete1()
+
+SQLCommand = ("""SELECT TP.logt_room_type As TypeDeLogement, 
        ROUND((count(TP.log_room_idtype)*100)/ (SELECT COUNT(*) FROM logements), 2) AS Pourcentage
 FROM logements L
 INNER JOIN types_logements TP ON L.log_room_idtype = TP.log_room_idtype 
@@ -24,7 +72,6 @@ ORDER BY Pourcentage DESC;""")
     cursor.execute(SQLCommand)
     for row in cursor.fetchall():
         print(f"{row[0]}: {round(row[1], 2)}")
-requete1()
 def requete2():
     reponse = int(input("Voulez-vous un diagramme ou la moyenne de prix par type de logement pour un type de logement en particulier ?\n1-Diagramme \n2-Prix en particulier\n"))
     if reponse == 1 :
@@ -71,7 +118,7 @@ def requete2():
         param = (f'{filtre}')
         cursor.execute(SQLCommand,param)
         for row in cursor.fetchall():
-            print(f"Type de logement : {row[0]} | Moyenne de prix de ce type de logement : {round(row[1], 2)}")
+            print(f"Type de logement : {row[0]} | Moyenne de prix de ce type de logement : {round(row[1], 2)} ")
         
             
         
