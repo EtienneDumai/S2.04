@@ -26,19 +26,59 @@ ORDER BY Pourcentage DESC;""")
         print(f"{row[0]}: {round(row[1], 2)}")
 requete1()
 def requete2():
-    SQLCommand = """
-    SELECT TP.logt_room_type AS TypeDeLogement, ROUND(AVG(logt_prix), 2) AS MoyennePrix
-    FROM logements L
-    INNER JOIN nodenot_bd.agglo_paysbasque AG ON L.logt_codeINSEE = nodenot_bd.AG.code_insee
-    INNER JOIN types_logements TP ON L.log_room_idtype = TP.log_room_idtype
-    GROUP BY TP.log_room_idtype
-    ORDER BY MoyennePrix DESC;
-    """
-    cursor.execute(SQLCommand)
-    for row in cursor.fetchall():
-        print(f"{row[0]}: {round(row[1], 2)}")  # Round to 2 decimal places when printing
+    reponse = int(input("Voulez-vous un diagramme ou la moyenne de prix par type de logement pour un type de logement en particulier ?\n1-Diagramme \n2-Prix en particulier\n"))
+    if reponse == 1 :
+        SQLCommand = """
+        SELECT TP.logt_room_type AS TypeDeLogement, ROUND(AVG(logt_prix), 2) AS MoyennePrix
+        FROM logements L
+        INNER JOIN nodenot_bd.agglo_paysbasque AG ON L.logt_codeINSEE = nodenot_bd.AG.code_insee
+        INNER JOIN types_logements TP ON L.log_room_idtype = TP.log_room_idtype
+        GROUP BY TP.log_room_idtype
+        ORDER BY MoyennePrix DESC;
+        """
+        cursor.execute(SQLCommand)
+        result = cursor.fetchall()
+        labels = ['Entire home/apt', 'Hotel room', 'Private room', 'Shared room']
+        sizes = [result[0][1], result[1][1],result[2][1],result[3][1]] 
+        plt.figure(figsize=(10, 6))
+        plt.bar(labels, sizes, color='skyblue')
+        plt.xlabel('Type de Logement')
+        plt.ylabel('Prix Moyen (€)')
+        plt.title('Prix Moyen par Type de Logement')
+        plt.xticks(rotation=45)
+        plt.show()
+    elif reponse == 2 :
+        valeur=int(input("Quel type de logement en particulier voulez-vous connaitre la moyenne de prix ?\n1-Entire home/apt \n2-Hotel room\n3-Private room\n4-Shared room\n"))
+        if valeur == 1 :
+            filtre = "Entire home/apt"
+        elif valeur == 2:
+            filtre = "Hotel room"
+        elif valeur == 3:
+            filtre = "Private room"
+        elif valeur == 4:
+            filtre = "Shared room"
+        else:
+            print("Veuillez entrer un réponse valide")
+        SQLCommand = """
+        SELECT TP.logt_room_type AS TypeDeLogement, ROUND(AVG(logt_prix), 2) AS MoyennePrix
+        FROM logements L
+        INNER JOIN nodenot_bd.agglo_paysbasque AG ON L.logt_codeINSEE = nodenot_bd.AG.code_insee
+        INNER JOIN types_logements TP ON L.log_room_idtype = TP.log_room_idtype
+        WHERE TP.logt_room_type = ?
+        GROUP BY TP.log_room_idtype
+        ORDER BY MoyennePrix DESC;
+        """
+        param = (f'{filtre}')
+        cursor.execute(SQLCommand,param)
+        for row in cursor.fetchall():
+            print(f"Type de logement : {row[0]} | Moyenne de prix de ce type de logement : {round(row[1], 2)}")
+        
+            
+        
+
 
 requete2()
+
 def requete3():
     reponse = int(input("Voulez-vous un diagramme ou le nombre de logement qui sont détenus par des hotes ou des superhotes ?\n1-Diagramme \n2-Valeur en particulier\n"))
     if reponse == 1 : 
@@ -91,6 +131,7 @@ def requete4():
         cursor.execute(SQLCommand)
         results = cursor.fetchone()
         labels = ['Superhôtes', 'Hôtes']
+        print(results)
         sizes = [results[0], results[1]] 
         plt.figure(figsize=(8, 6))
         plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
@@ -100,7 +141,7 @@ def requete4():
         plt.title('Pourcentage de Superhôtes vs Hôtes')
         plt.show()
     elif reponse == 2:
-        valeur = int(input("Voulez - vous le pourcentage de superhote ou le pourcentage d'hote ?\n1- Super-Hote \n2- Hote\n"))
+        valeur = int(input("Voulez-vous le pourcentage de superhote ou le pourcentage d'hote ?\n1- Super-Hote \n2- Hote\n"))
         if valeur == 1:
             
             SQLCommand = ("""SELECT
@@ -205,4 +246,16 @@ sql = "SELECT LDC.Numero, SUM(A.CoutHT*LDC.Quantite) AS coutTotalHT FROM Article
 param = (f'{filter}%')
 cursor.execute(sql, param)
 for row in cursor.fetchall() : 
+    print(row)
+    
+SQLCommand= ("""SELECT TP.logt_room_type AS TypeDeLogement, ROUND(AVG(logt_prix),2) AS MoyennePrix
+FROM logements L
+INNER JOIN nodenot_bd.agglo_paysbasque AG
+ON L.logt_codeINSEE = nodenot_bd.AG.code_insee
+INNER JOIN types_logements TP
+ON L.log_room_idtype = TP.log_room_idtype
+GROUP BY TP.logt_room_type;
+""")
+cursor.execute(SQLCommand)
+for row in cursor.fetchall():
     print(row)
