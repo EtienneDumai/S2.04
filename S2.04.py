@@ -185,7 +185,7 @@ def requete2():
             cursor.execute(SQLCommand,param)
             #affichage du résultat de la requete
             for row in cursor.fetchall():
-                print(f"Type de logement : {row[0]} | Moyenne de prix de ce type de logement : {round(row[1], 2)} ")
+                print(f"Type de logement : {row[0]} \nMoyenne de prix de ce type de logement : {round(row[1], 2)} ")
             break
         else:
             print("\nVeuillez entrer une réponse correcte\n")
