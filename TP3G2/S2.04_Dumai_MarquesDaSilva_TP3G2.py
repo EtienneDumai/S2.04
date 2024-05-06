@@ -1,3 +1,6 @@
+#Auteurs : DUMAI Etienne / MARQUESDASILVA Thomas
+
+
 #importation des bibliothèques permettant d'acceder à une base de données, et de faire des diagrammes
 import pyodbc as pc
 import matplotlib as plt
