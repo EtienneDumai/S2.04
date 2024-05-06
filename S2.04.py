@@ -23,18 +23,18 @@ def appli():
         elif reponse == 4 :
             requete4()
         #numéro permettant d'arreter le programme quand l'utilisateur le veux
-        elif reponse == 9199 :
+        elif reponse == 999 :
             break
         #message d'erreur si l'utilisateur entre un numéro non pris en compte
         else:
-            print("Veuillez entrer un numéro valide\n")
+            print("\nVeuillez entrer un numéro valide\n")
 appli()
 #requete numéro 1 : Pourcentage de logement par type de logement 
 def requete1():
     while True:
     
         #entrée a faire par l'user pour choisir la requete qu'il veut faire diagramme ou une valeur précise
-        reponse = int(input("Voulez-vous un diagramme ou le pourcentage du nombre de logement par type ?\n1-Diagramme \n2-Valeur en particulier\n"))
+        reponse = int(input("\nVoulez-vous un diagramme ou le pourcentage du nombre de logement par type ?\n1-Diagramme \n2-Valeur en particulier\n"))
         if reponse == 1:
             #requete SQL pour créer le diagramme
             SQLCommand = ("""SELECT TP.logt_room_type As TypeDeLogement, 
